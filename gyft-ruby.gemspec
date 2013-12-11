@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'gyft/ruby/version'
+require 'gyft/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "gyft-ruby"
-  spec.version       = Gyft::Ruby::VERSION
+  spec.name          = "gyft"
+  spec.version       = Gyft::VERSION
   spec.authors       = ["Audee Velasco"]
   spec.email         = ["auds@adooylabs.com"]
   spec.description   = %q{Ruby gem for gyft platform}

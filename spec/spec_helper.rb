@@ -1,6 +1,6 @@
 require "gyft-ruby"
 
-describe Gyft::Ruby do
+describe Gyft do
   describe "#" do
   end
 end
