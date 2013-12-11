@@ -7,8 +7,10 @@ rescue LoadError
 end
 
 module Gyft
+  @api = "8ja46uvwvbms7zcez4wthagx"
+  @secret = "fcjJA7TJ9X"
   @tstamp = ""
-  @endpoint = "http://sandbox.gyft.com"
+  @endpoint = "http://sandbox.gyft.com/v1/"
 
   class << self
     attr_accessor :endpoint, :api_key, :secret_key
@@ -17,7 +19,7 @@ module Gyft
   def self.request
     begin
       @tstamp = self.timestamp
-      RestClient.get 'http://sandbox.gyft.com/v1/reseller/account', params: { api_key: "nkspvnetef3yyj5ytvsjdkwk", sig: "#{self.signature}" }, headers: {"x-sig-timestamp" => "#{@tstamp}"} 
+      RestClient.get "#{@endpoint}reseller/account", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: {"x-sig-timestamp" => "#{@tstamp}"} 
     rescue => e
       e.response
     end
@@ -25,7 +27,12 @@ module Gyft
 
   def self.health
     @tstamp = self.timestamp
-    RestClient.get 'http://sandbox.gyft.com/v1/health/check', params: { api_key: "nkspvnetef3yyj5ytvsjdkwk", sig: "#{self.signature}" }, headers: { "x-sig-timestamp" => "#{@tstamp}"}
+    RestClient.get "#{@endpoint}health/check", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: { "x-sig-timestamp" => "#{@tstamp}"}
+  end
+
+  def self.check
+    @tstamp = self.timestamp
+    RestClient::Resource.new "#{@endpoint}health/check", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: { "x-sig-timestamp" => "#{@tstamp}"}
   end
 
   def account_info
@@ -49,8 +56,8 @@ module Gyft
     span = span.to_i.to_s
   end
 
-  def self.signature      
+  def self.signature(timestamp)    
     sha256 = Digest::SHA256.new
-    sha256.hexdigest "nkspvnetef3yyj5ytvsjdkwk" + "aPkbyRjvbX" + @tstamp
+    sha256.hexdigest "#{@api}" + "#{@secret}" + "#{timestamp}"
   end
 end
