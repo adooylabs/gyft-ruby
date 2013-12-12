@@ -16,23 +16,41 @@ module Gyft
     attr_accessor :endpoint, :api_key, :secret_key
   end
 
+  def self.account
+    begin
+      @tstamp = self.timestamp
+      client = RestClient::Resource.new "#{@endpoint}reseller/account?api_key=#{@api}&sig=#{self.signature(@tstamp)}", headers: {"x-sig-timestamp" => "#{@tstamp}"},  accept: :json
+      res = client.get
+      JSON.parse(res)
+    rescue => e
+      e.response
+    end
+  end
+
   def self.request
     begin
       @tstamp = self.timestamp
-      RestClient.get "#{@endpoint}reseller/account", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: {"x-sig-timestamp" => "#{@tstamp}"} 
+      client = RestClient::Resource.new "#{@endpoint}reseller/account?api_key=#{@api}&sig=#{self.signature(@tstamp)}", headers: {"x-sig-timestamp" => "#{@tstamp}"},  accept: :json
+      res = client.get
+      JSON.parse(res)
     rescue => e
       e.response
     end
   end
 
   def self.health
-    @tstamp = self.timestamp
-    RestClient.get "#{@endpoint}health/check", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: { "x-sig-timestamp" => "#{@tstamp}"}
+    begin
+      @tstamp = self.timestamp
+      client = RestClient::Resource.new "#{@endpoint}health/check?api_key=#{@api}&sig=#{self.signature(@tstamp)}", headers: {"x-sig-timestamp" => "#{@tstamp}"},  accept: :json
+      res = client.get
+      res.code #since does not return any data reutnr respond code itself
+    rescue => e
+      e.response
+    end
   end
 
   def self.check
-    @tstamp = self.timestamp
-    RestClient::Resource.new "#{@endpoint}health/check", params: { api_key: "#{@api}", sig: "#{self.signature(@tstamp)}" }, headers: { "x-sig-timestamp" => "#{@tstamp}"}
+
   end
 
   def account_info
@@ -52,12 +70,11 @@ module Gyft
   end
 
   def self.timestamp
-    span = Time.now.utc - Time.utc(1970,1,1)
-    span = span.to_i.to_s
+    span = Time.now.to_i
   end
 
-  def self.signature(timestamp)    
-    sha256 = Digest::SHA256.new
-    sha256.hexdigest "#{@api}" + "#{@secret}" + "#{timestamp}"
+  def self.signature( timestamp )
+    msg = "#{@api}" + "#{@secret}" + "#{timestamp}"
+    Digest::SHA256.hexdigest msg
   end
 end
