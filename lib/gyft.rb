@@ -49,14 +49,6 @@ module Gyft
     end
   end
 
-  def self.check
-
-  end
-
-  def account_info
-
-  end
-
   def list_transaction
     
   end
