@@ -1,4 +1,4 @@
-require "gyft-ruby"
+require "gyft"
 
 describe Gyft do
   describe "#" do
